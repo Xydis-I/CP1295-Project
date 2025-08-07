@@ -19,7 +19,7 @@ export class Note {
      * @param {number} options.y - Y position on the board
      * @param {string} options.color - CSS class for note color
      */
-    constructor({ id = null, content = '', x = 0, y = 0, color = null, image = null }) {
+    constructor({ id = null, content = '', x = 0, y = 0, color = null, image = null, timestamp = null }) {
         this.id = id || this.generateId();
         this.content = content;
         this.x = x;
@@ -28,6 +28,18 @@ export class Note {
         this.element = null;
 
         this.image = image || null;
+        this.timestamp = timestamp || this.getTimestamp();
+    }
+
+    getTimestamp() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hour}:${minute}`;
     }
 
     /**
@@ -72,6 +84,11 @@ export class Note {
             img.classList.add('note-image');
             noteElement.insertBefore(img, contentElement); // place above text
         }
+
+        const timestampElement = document.createElement('div');
+        timestampElement.classList.add('note-timestamp');
+        timestampElement.textContent = this.timestamp;
+        noteElement.appendChild(timestampElement);
 
         // Store reference to the element
         this.element = noteElement;
@@ -118,7 +135,8 @@ export class Note {
             y: this.y,
             color: this.color,
 
-            image: this.image
+            image: this.image,
+            timestamp: this.timestamp
         };
     }
 
