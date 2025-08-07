@@ -13,6 +13,8 @@ import { saveNotes, exportNotesAsJson } from './storage.js';
 export function initializeUI(noteManager) {
     const noteBoard = document.getElementById('note-board');
     const exportBtn = document.getElementById('export-btn');
+    const ascendingBtn = document.getElementById('sort-asc-btn');
+    const descendingBtn = document.getElementById('sort-desc-btn');
 
     // Double click on board to create a new note
     noteBoard.addEventListener('dblclick', (event) => {
@@ -25,6 +27,14 @@ export function initializeUI(noteManager) {
     // Export button click handler
     exportBtn.addEventListener('click', () => {
         exportNotes(noteManager);
+    });
+
+    ascendingBtn.addEventListener('click', () => {
+        sortNotes(noteManager, 'asc');
+    });
+
+    descendingBtn.addEventListener('click', () => {
+        sortNotes(noteManager, 'desc');
     });
 
     // Setup auto-save timer
@@ -228,6 +238,57 @@ export function deleteNote(noteElement, note, noteManager) {
 export function exportNotes(noteManager) {
     const notes = noteManager.toJSON();
     exportNotesAsJson(notes);
+}
+
+/**
+ * Sort and relocate notes
+ * @param {NoteManager} noteManager - The note manager instance
+ * @param {string} order - String representing desired order.
+ */
+export function sortNotes(noteManager, order = 'asc') {
+    const noteBoard = document.getElementById('note-board');
+    const noteWidth = 200;
+    const padding = 15;
+    const edgePadding = 15;
+    const columns = Math.floor(noteBoard.clientWidth / (noteWidth + padding));
+    
+    noteBoard.innerHTML = '';
+
+    const sortedNotes = noteManager.getAllNotes().sort((a, b) => {
+        const timeA = new Date(a.timestamp).getTime();
+        const timeB = new Date(b.timestamp).getTime();
+        return order === 'asc' ? timeA - timeB : timeB - timeA;
+    });
+
+    const noteElements = sortedNotes.map((note) => {
+        const element = note.createElement();
+        setupNoteEventListeners(element, note, noteManager);
+        noteBoard.appendChild(element);
+        return { note, element: element };
+    });
+
+    let yOffset = edgePadding;
+
+    for (let i = 0; i < noteElements.length; i += columns) {
+        const rowNotes = noteElements.slice(i, i + columns);
+        const rowHeight = Math.max(...rowNotes.map(n => n.element.offsetHeight));
+
+        rowNotes.forEach((n, j) => {
+            const x = edgePadding + j * (noteWidth + padding);
+            const y = yOffset;
+
+            n.note.updatePosition(x, y);
+
+            n.element.style.position = 'absolute';
+            n.element.style.left = `${x}px`;
+            n.element.style.top = `${y}px`;
+        });
+        yOffset += rowHeight + padding;
+    }
+    noteBoard.style.height = `${yOffset + edgePadding}px`;
+
+    const notes = noteManager.toJSON();
+    saveNotes(notes);
 }
 
 /**
