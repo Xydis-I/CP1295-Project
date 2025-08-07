@@ -139,6 +139,38 @@ export function setupNoteEventListeners(noteElement, note, noteManager) {
         event.preventDefault();
     });
     
+    // Dragging image over note
+    noteElement.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        noteElement.classList.add('note-drag-over'); // optional highlight
+    });
+
+    // Dragging image away from note
+    noteElement.addEventListener('dragleave', () => {
+        noteElement.classList.remove('note-drag-over');
+    });
+
+    // Dropped/Released image over note
+    noteElement.addEventListener('drop', async (event) => {
+        event.preventDefault();
+        noteElement.classList.remove('note-drag-over');
+
+        const file = event.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+                const img = document.createElement('img');
+                img.src = fileReader.result;
+                img.alt = "Image";
+                img.classList.add('note-image');
+
+                const contentElement = noteElement.querySelector('.note-content');
+                noteElement.insertBefore(img, contentElement);
+            };
+            fileReader.readAsDataURL(file);
+        }
+    });
+
     // Drag move
     document.addEventListener('mousemove', (event) => {
         if (!isDragging) return;

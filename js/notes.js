@@ -19,13 +19,15 @@ export class Note {
      * @param {number} options.y - Y position on the board
      * @param {string} options.color - CSS class for note color
      */
-    constructor({ id = null, content = '', x = 0, y = 0, color = null }) {
+    constructor({ id = null, content = '', x = 0, y = 0, color = null, image = null }) {
         this.id = id || this.generateId();
         this.content = content;
         this.x = x;
         this.y = y;
         this.color = color || this.getRandomColor();
         this.element = null;
+
+        this.image = image || null;
     }
 
     /**
@@ -63,6 +65,14 @@ export class Note {
         const contentElement = noteElement.querySelector('.note-content');
         contentElement.textContent = this.content;
         
+        if (this.image) {
+            const img = document.createElement('img');
+            img.src = this.image;
+            img.alt = "Image";
+            img.classList.add('note-image');
+            noteElement.insertBefore(img, contentElement); // place above text
+        }
+
         // Store reference to the element
         this.element = noteElement;
         return noteElement;
@@ -106,7 +116,9 @@ export class Note {
             content: this.content,
             x: this.x,
             y: this.y,
-            color: this.color
+            color: this.color,
+
+            image: this.image
         };
     }
 

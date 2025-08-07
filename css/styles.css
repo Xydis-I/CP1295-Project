@@ -135,6 +135,19 @@ header {
     background-color: var(--note-pink);
 }
 
+/* Note images */
+.note-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 0.2em;
+    display: block;
+}
+
+.note.note-drag-over {
+    outline: 2px dashed black;
+}
+
+
 /* Animation for deleting notes */
 .note-fade-out {
     animation: fade-out 0.3s ease forwards;
