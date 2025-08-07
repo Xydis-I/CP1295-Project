@@ -159,6 +159,7 @@ export function setupNoteEventListeners(noteElement, note, noteManager) {
         if (file && file.type.startsWith('image/')) {
             const fileReader = new FileReader();
             fileReader.onload = () => {
+                note.image = fileReader.result;
                 const img = document.createElement('img');
                 img.src = fileReader.result;
                 img.alt = "Image";
