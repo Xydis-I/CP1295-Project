@@ -122,6 +122,13 @@ header {
     overflow-wrap: break-word;
 }
 
+.note-timestamp {
+    font-style: italic;
+    font-size: 0.6em;
+    margin-top: 0.5em;
+    text-align: right;
+}
+
 /* Note colors */
 .note-blue {
     background-color: var(--note-blue);
