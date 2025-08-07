@@ -99,7 +99,7 @@ export function setupNoteEventListeners(noteElement, note, noteManager) {
     
     // Content change handler
     contentElement.addEventListener('input', () => {
-        note.updateContent(contentElement.textContent);
+        note.updateContent(contentElement.innerText);
     });
     
     // Delete button handler
