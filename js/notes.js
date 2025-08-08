@@ -38,8 +38,9 @@ export class Note {
         const day = String(now.getDate()).padStart(2, '0');
         const hour = String(now.getHours()).padStart(2, '0');
         const minute = String(now.getMinutes()).padStart(2, '0');
+        const second = String(now.getSeconds()).padStart(2, '0');
 
-        return `${year}-${month}-${day} ${hour}:${minute}`;
+        return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     }
 
     /**
@@ -113,11 +114,12 @@ export class Note {
     /**
      * Update the note's content
      * @param {string} content - New content
+     * @param {boolean} isQuote - Boolean for updates that include quotes
      */
-    updateContent(content) {
+    updateContent(content, isQuote = false) {
         this.content = content;
-        
-        if (this.element) {
+
+        if (isQuote && this.element) {
             const contentElement = this.element.querySelector('.note-content');
             contentElement.textContent = content;
         }
@@ -160,8 +162,9 @@ export class Note {
             const newContent = this.content 
                 ? `${this.content}\n\n${quote}`
                 : quote;
+
+            this.updateContent(newContent, true);
             
-            this.updateContent(newContent);
             return quote;
         } catch (error) {
             console.error('Error fetching quote:', error);

@@ -16,6 +16,15 @@ export function initializeUI(noteManager) {
     const ascendingBtn = document.getElementById('sort-asc-btn');
     const descendingBtn = document.getElementById('sort-desc-btn');
 
+    // Track mouse location
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    document.addEventListener('mousemove', (event) => {
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+    });
+
     // Double click on board to create a new note
     noteBoard.addEventListener('dblclick', (event) => {
         // Only create note if we clicked directly on the board, not on an existing note
@@ -24,15 +33,35 @@ export function initializeUI(noteManager) {
         }
     });
 
+    // Start typing on board to create a new note at mouse
+    document.addEventListener('keydown', (event) => {
+        const activeElement = document.activeElement;
+        const isTextbox = activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable;
+
+        // Check that a note isn't being currently typed and that the event key wasn't a special key.
+        if (!isTextbox && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            const newNote = createNewNote(mouseX, mouseY, noteManager);
+
+            const textarea = newNote.querySelector('textarea');
+            if (textarea) {
+                textarea.focus();
+                textarea.value = event.key;
+                textarea.setSelectionRange(1, 1);
+            }
+        }
+    });
+
     // Export button click handler
     exportBtn.addEventListener('click', () => {
         exportNotes(noteManager);
     });
 
+    // Ascending button click handler
     ascendingBtn.addEventListener('click', () => {
         sortNotes(noteManager, 'asc');
     });
 
+    // Descending button click handler
     descendingBtn.addEventListener('click', () => {
         sortNotes(noteManager, 'desc');
     });
@@ -99,7 +128,7 @@ export function setupNoteEventListeners(noteElement, note, noteManager) {
     
     // Content change handler
     contentElement.addEventListener('input', () => {
-        note.updateContent(contentElement.textContent);
+        note.updateContent(contentElement.innerText);
     });
     
     // Delete button handler
